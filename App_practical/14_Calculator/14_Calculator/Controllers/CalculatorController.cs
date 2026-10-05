@@ -18,6 +18,7 @@ namespace Calculator.Controllers
        num2, Operation operation)
         {
             double result = 0;
+            string errore = null;
             switch (operation)
             {
                 case Operation.Add:
@@ -30,11 +31,25 @@ namespace Calculator.Controllers
                     result = num1 * num2;
                     break;
                 case Operation.Divide:
-                    result = num1 / num2;
+                    if (num2 == 0)
+                    {
+                        errore = "Деление на ноль";
+                    }
+                    else
+                    {
+                        result = num1 / num2;
+                    }
                     break;
             }
-            ViewBag.Result = result;
-            return View("Index");
+            if (errore != null)
+            {
+                ViewBag.Error = errore;
+            }
+            else
+            {
+                ViewBag.Result = result;
+            }
+                return View("~/Views/Home/Index.cshtml"); ;
         }
     }
 }
