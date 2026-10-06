@@ -2,7 +2,9 @@
     ViewData["Title"] = "Крутой белый калькулятор";
 }
 <h2>@ViewData["Title"]</h2>
+
 <p>Вводи только цифры, иначе не круто!</p>
+
 <form method="post" asp-controller="Calculator" asp-action="Calculate">
     @Html.AntiForgeryToken()
 
