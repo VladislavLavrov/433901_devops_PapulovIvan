@@ -1,14 +1,15 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
+EXPOSE 5014
+
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-COPY . /src
 WORKDIR /src
-RUN ls
-RUN dotnet restore
-RUN dotnet build "./Calculator.csproj" -c Release -o /app/build
-FROM build AS publish
-RUN dotnet publish "./Calculator.csproj" -c Release -o /app/publish
+COPY ["14_Calculator.csproj", "./"]
+RUN dotnet restore "14_Calculator.csproj"
+COPY . .
+RUN dotnet publish "14_Calculator.csproj" -c Release -o /app/publish
+
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish ./
-ENTRYPOINT ["dotnet", "Calculator.dll"]
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "14_Calculator.dll"]
