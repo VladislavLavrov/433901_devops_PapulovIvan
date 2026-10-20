@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Calculator.Data;
+
+using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Mvc;
 namespace Calculator.Controllers
 {
     public enum Operation
@@ -7,6 +10,12 @@ namespace Calculator.Controllers
     }
     public class CalculatorController : Controller
     {
+        private CalculatorContext _context;
+        public CalculatorController(CalculatorContext
+       context)
+        {
+            _context = context;
+        }
         [HttpGet]
         public IActionResult Index()
         {
@@ -15,10 +24,9 @@ namespace Calculator.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Calculate(double num1, double
-       num2, Operation operation)
+num2, Operation operation)
         {
             double result = 0;
-            string errore = null;
             switch (operation)
             {
                 case Operation.Add:
@@ -31,25 +39,21 @@ namespace Calculator.Controllers
                     result = num1 * num2;
                     break;
                 case Operation.Divide:
-                    if (num2 == 0)
-                    {
-                        errore = "Деление на ноль";
-                    }
-                    else
-                    {
-                        result = num1 / num2;
-                    }
+                    result = num1 / num2;
                     break;
             }
-            if (errore != null)
-            {
-                ViewBag.Error = errore;
-            }
-            else
-            {
-                ViewBag.Result = result;
-            }
-                return View("~/Views/Home/Index.cshtml"); ;
+            ViewBag.Result = result;
+            DataInputVariant dataInputVariant = new
+           DataInputVariant();
+            dataInputVariant.Operand_1 = num1.ToString();
+            dataInputVariant.Operand_2 = num2.ToString();
+            dataInputVariant.Type_operation = operation.
+           ToString();
+            dataInputVariant.Result = result.ToString();
+
+            _context.DataInputVariants.Add(dataInputVariant);
+            _context.SaveChanges();
+            return View("Index");
         }
     }
 }
