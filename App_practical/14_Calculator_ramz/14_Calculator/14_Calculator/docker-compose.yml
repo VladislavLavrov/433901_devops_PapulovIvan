@@ -1,0 +1,37 @@
+services:
+  mariadb:
+    image: mariadb:10.11
+    container_name: web-mariadb-14
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-local_root_password}
+      MARIADB_DATABASE: 14-WebCalculatorDb
+      MARIADB_USER: webcalc
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-local_webcalc_password}
+    ports:
+      - "127.0.0.1:5033:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  web:
+    container_name: web-app-14-calculator
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_URLS: http://+:5014
+      ConnectionStrings__CalculatorDb: Server=mariadb;Port=3306;Database=14-WebCalculatorDb;User=webcalc;Password=${MARIADB_PASSWORD:-local_webcalc_password};
+    ports:
+      - "5014:5014"
+
+volumes:
+  mariadb_data:
