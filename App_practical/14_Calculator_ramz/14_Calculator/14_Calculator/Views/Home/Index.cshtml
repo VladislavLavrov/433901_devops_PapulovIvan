@@ -1,0 +1,26 @@
+@using _14_Calculator.Models
+@{
+    ViewData["Title"] = "Калькулятор с историей вычислений";
+    var history = ViewBag.History as List<CalculationRecord> ?? new List<CalculationRecord>();
+}
+<div class="container py-4">
+    <h2>@ViewData["Title"]</h2>
+    <p>Результаты успешных вычислений сохраняются в MariaDB.</p>
+    <form method="post" asp-controller="Calculator" asp-action="Calculate" class="row g-2 align-items-center">
+        @Html.AntiForgeryToken()
+        <div class="col-auto"><input class="form-control" type="number" step="any" name="num1" value="@ViewBag.Num1" required /></div>
+        <div class="col-auto"><select class="form-select" name="operation" required>
+            <option value="Add">+</option><option value="Subtract">−</option><option value="Multiply">×</option><option value="Divide">÷</option>
+        </select></div>
+        <div class="col-auto"><input class="form-control" type="number" step="any" name="num2" value="@ViewBag.Num2" required /></div>
+        <div class="col-auto"><button class="btn btn-primary" type="submit">Вычислить</button></div>
+    </form>
+    @if (ViewBag.Error != null) { <div class="alert alert-danger mt-3">@ViewBag.Error</div> }
+    @if (ViewBag.Result != null) { <div class="alert alert-success mt-3">Результат: <strong>@ViewBag.Result</strong></div> }
+    <h3 class="mt-4">Последние вычисления</h3>
+    @if (history.Count == 0) { <p>История пока пуста.</p> } else {
+        <div class="table-responsive"><table class="table table-striped"><thead><tr><th>ID</th><th>Первое число</th><th>Операция</th><th>Второе число</th><th>Результат</th><th>Дата (UTC)</th></tr></thead><tbody>
+        @foreach (var item in history) { <tr><td>@item.ID_DataInputVariant</td><td>@item.Operand_1</td><td>@(item.Type_operation switch { "Add" => "+", "Subtract" => "−", "Multiply" => "×", "Divide" => "÷", _ => item.Type_operation })</td><td>@item.Operand_2</td><td>@item.Result</td><td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td></tr> }
+        </tbody></table></div>
+    }
+</div>
