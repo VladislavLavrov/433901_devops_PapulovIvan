@@ -18,3 +18,9 @@ services:
     build: Calculator/
     ports:
       - "0.0.0.0:5014:5014"
+
+  networks:
+    default:
+      ipam:
+        config:
+          - subnet: 93.88.178.160/27
